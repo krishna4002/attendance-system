@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Attendance Logs</title>
+  <style>
+    /* Reset and base */
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+    }
+
+    /* Center the whole page */
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;  /* vertical center */
+      align-items: center;      /* horizontal center */
+      padding: 2rem;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .header h1 {
+      margin: 0 0 1rem;
+    }
+    .back-btn {
+      text-decoration: none;
+      color: #0077cc;
+      font-weight: bold;
+    }
+
+    /* Main content card */
+    .content-card {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 900px;
+    }
+
+    /* Action buttons */
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .primary-btn,
+    .danger-btn {
+      padding: 0.6rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #fff;
+    }
+    .primary-btn {
+      background: #28a745;
+    }
+    .primary-btn:hover {
+      background: #218838;
+    }
+    .danger-btn {
+      background: #dc3545;
+    }
+    .danger-btn:hover {
+      background: #c82333;
+    }
+
+    /* Table styling */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+    .data-table th,
+    .data-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    .data-table th {
+      background: #f0f0f0;
+      font-weight: bold;
+    }
+    .data-table tbody tr:hover {
+      background: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Student Attendance Logs</h1>
+    <a href="attendance-logs.html" class="back-btn">← Back</a>
+  </header>
+
+  <main class="content-card">
+    <!-- Action Buttons -->
+    <div class="actions">
+      <button class="primary-btn" id="downloadCsv">Download CSV</button>
+      <button class="danger-btn" id="clearLogs">Clear All Logs</button>
+    </div>
+
+    <!-- Attendance Table -->
+    <table class="data-table" id="studentTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Subject</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Example demo rows -->
+        <tr><td>ST01</td><td>John Doe</td><td>Machine Learning</td><td>2025-09-16</td><td>09:05</td><td>Present</td></tr>
+        <tr><td>ST02</td><td>Mary Jane</td><td>OOPs</td><td>2025-09-16</td><td>09:10</td><td>Present</td></tr>
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    const table = document.getElementById('studentTable');
+    document.getElementById('downloadCsv').addEventListener('click', () => {
+      let csv = '';
+      table.querySelectorAll('tr').forEach(row => {
+        const cols = Array.from(row.querySelectorAll('th,td')).map(c => `"${c.innerText}"`);
+        csv += cols.join(',') + '\n';
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'student_attendance.csv';
+      a.click();
+    });
+
+    document.getElementById('clearLogs').addEventListener('click', () => {
+      if (confirm('Are you sure you want to clear all logs?')) {
+        table.querySelector('tbody').innerHTML = '';
+      }
+    });
+  </script>
+</body>
+</html>

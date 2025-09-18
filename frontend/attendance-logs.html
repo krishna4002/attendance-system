@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance Logs</title>
+<style>
+  /* Reset & base */
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+  }
+
+  /* Center content vertically & horizontally */
+  body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   /* vertical center */
+    align-items: center;       /* horizontal center */
+    padding: 2rem;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .header h1 {
+    margin: 0 0 1rem;
+  }
+  .back-btn {
+    text-decoration: none;
+    color: #0077cc;
+    font-weight: bold;
+  }
+
+  /* Responsive menu grid */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+    justify-items: center;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  /* Menu cards */
+  .menu-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 220px;
+    height: 130px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  }
+  .menu-card h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<header class="header">
+  <h1>Attendance Logs</h1>
+  <a href="admin.html" class="back-btn">← Back</a>
+</header>
+
+<main class="menu-grid">
+  <a href="teacher-attendance.html" class="menu-card"><h2>Teacher Attendance</h2></a>
+  <a href="student-attendance.html" class="menu-card"><h2>Student Attendance</h2></a>
+</main>
+</body>
+</html>

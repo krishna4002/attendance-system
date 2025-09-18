@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Student Attendance — Greenfield</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="bg-slate-50 min-h-screen">
+  <header class="bg-white/80 sticky top-0 shadow">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div><a href="menu.html" class="text-slate-700 hover:underline">← Back to Menu</a></div>
+      <div><a href="index.html" class="btn-ghost">Home</a></div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    <h2 class="text-2xl font-semibold mb-4">Student Attendance (Real-Time)</h2>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="md:col-span-2 card p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold">Live Camera</h3>
+            <p class="text-sm text-slate-500">Allow camera permission. Every 3s a frame is captured and sent.</p>
+          </div>
+          <div>
+            <button id="startStud" class="btn-primary mr-2">Start</button>
+            <button id="stopStud" class="btn-ghost">Stop</button>
+          </div>
+        </div>
+
+        <div class="mt-4 grid md:grid-cols-2 gap-4">
+          <div>
+            <video id="studentCam" class="w-full h-72 bg-black rounded-lg" autoplay muted playsinline></video>
+            <div class="mt-2 text-xs text-slate-500">Preview — every 3s a frame is captured.</div>
+          </div>
+
+          <div>
+            <div id="studentAlerts"></div>
+            <div class="mt-4">
+              <div class="text-sm text-slate-500">Last result</div>
+              <div id="studentLast" class="text-lg font-semibold mt-2">No captures yet</div>
+              <div class="mt-4">
+                <button id="studentViewHist" class="px-3 py-2 border rounded-md">Attendance View</button>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <h4 class="font-medium">Operation Mode</h4>
+              <p class="text-sm text-slate-500 mt-2">Choose backend mode or local simulation (useful if backend not connected).</p>
+              <div class="mt-3">
+                <select id="studentMode" class="block w-full border rounded p-2">
+                  <option value="backend">Backend Mode (POST /api/recognize/student)</option>
+                  <option value="local" selected>Local Simulation (no backend)</option>
+                </select>
+                <div id="studentSimControls" class="mt-3">
+                  <label class="block text-sm">Simulate match with:</label>
+                  <select id="studentSimList" class="mt-2 block w-full border rounded p-2"></select>
+                  <button id="clearStudSim" class="mt-3 btn-ghost">Clear Simulation</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <aside class="hidden md:block">
+        <div class="card p-4">
+          <h4 class="font-semibold">Scanner Status</h4>
+          <div class="mt-2 text-sm text-slate-500" id="studentScanner">Idle</div>
+          <div class="mt-4">
+            <button id="studentStopAll" class="w-full btn-ghost">Stop & Close Camera</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script src="assets/main.js"></script>
+  <script>
+  (function(){
+    // Elements
+    const startBtn = document.getElementById('startStud'), stopBtn = document.getElementById('stopStud');
+    const video = document.getElementById('studentCam'), studentScanner = document.getElementById('studentScanner');
+    const last = document.getElementById('studentLast'), alerts = document.getElementById('studentAlerts');
+    const simMode = document.getElementById('studentMode'), simList = document.getElementById('studentSimList'), clearSim = document.getElementById('clearStudSim');
+
+    // populate simList
+    function loadSimList(){
+      const users = getUsersByRole('student');
+      simList.innerHTML = '<option value=\"\">-- select student to simulate --</option>';
+      users.forEach(u => { const opt = document.createElement('option'); opt.value = u.id; opt.innerText = `${u.id} • ${u.name}`; simList.appendChild(opt); });
+    }
+    loadSimList();
+    window.addEventListener('storage', loadSimList);
+
+    let stream=null, timer=null;
+    startBtn.addEventListener('click', async ()=>{
+      try{
+        stream = await startCamera(video);
+        studentScanner.innerText = 'Running...';
+        last.innerText = 'Waiting for capture...';
+        timer = setInterval(async ()=>{
+          const blob = await captureFrame(video);
+          if(!blob) return;
+          last.innerText = 'Processing...';
+          if(simMode.value === 'backend'){
+            // Backend mode - send to /api/recognize/student (expects JSON: {status:'ok', id:'ST01', name:'John'})
+            try{
+              const fd = new FormData(); fd.append('image', blob, 'frame.jpg');
+              const res = await fetch('/api/recognize/student', { method:'POST', body: fd });
+              const j = await res.json();
+              if(j.status === 'ok'){
+                last.innerText = `Attendance marked for ${j.id}`;
+                showInline(alerts,'success', `Attendance marked for ${j.id} (${j.name})`);
+                // mark attendance
+                await fetch('/api/mark_attendance/student', { method:'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ id: j.id }) });
+              } else {
+                last.innerText = 'Face not found';
+                showInline(alerts,'warn','Face not found');
+              }
+            }catch(err){
+              // backend error fallback
+              showInline(alerts,'error','Backend error — falling back to local simulation');
+              fallbackLocal();
+            }
+          } else {
+            // local simulation
+            fallbackLocal();
+          }
+
+          function fallbackLocal(){
+            const simulateId = simList.value;
+            if(simulateId){
+              addAttendance('student', simulateId, 'Present');
+              last.innerText = `Attendance marked for ${simulateId}`;
+              showInline(alerts,'success', `Attendance marked for ${simulateId}`);
+            } else {
+              last.innerText = 'Face not found';
+              showInline(alerts,'warn','Face not found (simulation)');
+            }
+          }
+        }, 3000);
+      }catch(err){
+        toast('Camera error: '+err.message,'error');
+      }
+    });
+
+    stopBtn.addEventListener('click', ()=>{
+      if(timer){ clearInterval(timer); timer=null; }
+      if(stream) stopStream(stream);
+      stream=null;
+      studentScanner.innerText = 'Stopped';
+      toast('Student scanner stopped','info');
+    });
+
+    clearSim.addEventListener('click', ()=>{ simList.value = ''; toast('Simulation cleared','info'); });
+
+    document.getElementById('studentViewHist').addEventListener('click', ()=>{
+      const id = prompt('Enter Student ID (e.g. ST01)');
+      if(!id) return;
+      try{
+        // try backend first
+        fetch('/api/attendance/student/'+encodeURIComponent(id)).then(r=>r.json()).then(j=>{
+          if(j && j.status === 'ok'){ let out = `Attendance for ${id}\\n\\n`; j.records.forEach(r=> out += `${r.date} ${r.time} - ${r.status}\\n`); alert(out); }
+          else {
+            // fallback local
+            const rec = getAttendance('student', id);
+            if(!rec || rec.length===0) return alert('No records for '+id);
+            let s = `Attendance for ${id}\\n\\n`; rec.forEach(r => s += `${r.date} ${r.time} - ${r.status}\\n`); alert(s);
+          }
+        }).catch(()=>{
+          const rec = getAttendance('student', id);
+          if(!rec || rec.length===0) return alert('No records for '+id);
+          let s = `Attendance for ${id}\\n\\n`; rec.forEach(r => s += `${r.date} ${r.time} - ${r.status}\\n`); alert(s);
+        });
+      }catch(e){ toast('Error','error'); }
+    });
+  })();
+  </script>
+</body>
+</html>

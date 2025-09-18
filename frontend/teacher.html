@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Teacher Attendance — Greenfield</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="bg-slate-50 min-h-screen">
+  <header class="bg-white/80 sticky top-0 shadow">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div><a href="menu.html" class="text-slate-700 hover:underline">← Back to Menu</a></div>
+      <div><a href="index.html" class="btn-ghost">Home</a></div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    <h2 class="text-2xl font-semibold mb-4">Teacher Attendance (Real-Time)</h2>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="md:col-span-2 card p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold">Live Camera</h3>
+            <p class="text-sm text-slate-500">Every 3 s a frame is captured and sent to the backend.</p>
+          </div>
+          <div>
+            <button id="startTeach" class="btn-primary mr-2">Start</button>
+            <button id="stopTeach" class="btn-ghost">Stop</button>
+          </div>
+        </div>
+
+        <div class="mt-4 grid md:grid-cols-2 gap-4">
+          <!-- Camera preview -->
+          <div>
+            <video id="teacherCam" class="w-full h-72 bg-black rounded-lg" autoplay muted playsinline></video>
+            <div class="mt-2 text-xs text-slate-500">Preview</div>
+          </div>
+
+          <!-- Status + controls -->
+          <div>
+            <div id="teacherAlerts"></div>
+            <div class="mt-4">
+              <div class="text-sm text-slate-500">Last result</div>
+              <div id="teacherLast" class="text-lg font-semibold mt-2">No captures yet</div>
+              <div class="mt-4">
+                <button id="teacherViewHist" class="px-3 py-2 border rounded-md">View Attendance</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="hidden md:block">
+        <div class="card p-4">
+          <h4 class="font-semibold">Scanner Status</h4>
+          <div class="mt-2 text-sm text-slate-500" id="teacherScanner">Idle</div>
+          <div class="mt-4">
+            <button id="teacherStopAll" class="w-full btn-ghost">Stop & Close Camera</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script src="assets/main.js"></script>
+  <script>
+  (function(){
+    const startBtn = document.getElementById('startTeach');
+    const stopBtn  = document.getElementById('stopTeach');
+    const video    = document.getElementById('teacherCam');
+    const scanner  = document.getElementById('teacherScanner');
+    const last     = document.getElementById('teacherLast');
+    const alerts   = document.getElementById('teacherAlerts');
+
+    let stream = null, timer = null;
+
+    startBtn.addEventListener('click', async () => {
+      try {
+        stream = await startCamera(video);
+        scanner.innerText = 'Running…';
+        last.innerText = 'Waiting for capture…';
+
+        timer = setInterval(async () => {
+          const blob = await captureFrame(video);
+          if (!blob) return;
+
+          last.innerText = 'Processing…';
+          try {
+            const fd = new FormData();
+            fd.append('file', blob, 'frame.jpg');
+            const res = await fetch('/api/recognize/teacher', { method: 'POST', body: fd });
+            if (!res.ok) throw new Error('Recognition failed');
+            const j = await res.json();
+            last.innerText = j.message || 'Attendance marked';
+            showInline(alerts, 'success', j.message || 'Attendance marked');
+          } catch (err) {
+            last.innerText = 'Face not recognized';
+            showInline(alerts, 'error', err.message || 'Recognition error');
+          }
+        }, 3000);
+      } catch (err) {
+        toast('Camera error: ' + err.message, 'error');
+      }
+    });
+
+    stopBtn.addEventListener('click', () => {
+      if (timer) { clearInterval(timer); timer = null; }
+      if (stream) stopStream(stream);
+      stream = null;
+      scanner.innerText = 'Stopped';
+      toast('Teacher scanner stopped', 'info');
+    });
+
+    document.getElementById('teacherStopAll').addEventListener('click', () => stopBtn.click());
+
+    document.getElementById('teacherViewHist').addEventListener('click', () => {
+      const id = prompt('Enter Teacher ID to view attendance (e.g. MT01)');
+      if (!id) return;
+      fetch('/api/attendance/teacher' + encodeURIComponent(id))
+        .then(r => r.json())
+        .then(j => {
+          if (j && j.status === 'ok') {
+            let out = `Attendance for ${id}\n\n`;
+            j.records.forEach(r => out += `${r.date} ${r.time} - ${r.status}\n`);
+            alert(out);
+          } else {
+            alert('No records found for ' + id);
+          }
+        })
+        .catch(() => alert('Unable to fetch attendance for ' + id));
+    });
+  })();
+  </script>
+</body>
+</html>

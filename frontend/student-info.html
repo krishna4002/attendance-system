@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Information</title>
+<style>
+  /* Base reset */
+  html, body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header pinned at top */
+  .header {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .header h1 {
+    margin: 0 0 0.5rem;
+  }
+  .back-btn {
+    text-decoration: none;
+    color: #0077cc;
+    font-weight: bold;
+  }
+
+  /* Main content */
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+  }
+  .content-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 2rem;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  /* Buttons */
+  .primary-btn {
+    background: #0077cc;
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    transition: background 0.2s ease;
+  }
+  .primary-btn:hover {
+    background: #005fa3;
+  }
+
+  /* Table styles */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: center;
+  }
+  th {
+    background: #f0f0f0;
+  }
+
+  @media (max-width: 600px) {
+    .content-card { padding: 1.5rem; }
+    th, td { font-size: 0.9rem; }
+    .primary-btn { font-size: 0.9rem; padding: 0.6rem 0.8rem; }
+  }
+</style>
+</head>
+<body>
+  <header class="header">
+    <h1>Student Information</h1>
+    <a href="manage-users.html" class="back-btn">← Back</a>
+  </header>
+
+  <main>
+    <section class="content-card">
+      <button class="primary-btn">Add Student</button>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be dynamically added here -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

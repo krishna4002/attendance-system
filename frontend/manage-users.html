@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Users</title>
+<style>
+  /* Base reset */
+  html, body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header pinned at top */
+  .header {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .header h1 {
+    margin: 0 0 0.5rem;
+  }
+  .back-btn {
+    text-decoration: none;
+    color: #0077cc;
+    font-weight: bold;
+  }
+
+  /* Main content centered */
+  main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  /* Grid layout */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    max-width: 800px;
+    justify-items: center;
+  }
+
+  /* Menu cards */
+  .menu-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 220px;
+    height: 130px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  }
+  .menu-card h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .menu-card {
+      width: 180px;
+      height: 110px;
+      font-size: 0.95rem;
+    }
+  }
+</style>
+</head>
+<body>
+  <header class="header">
+    <h1>Manage Users</h1>
+    <a href="admin.html" class="back-btn">← Back</a>
+  </header>
+
+  <main>
+    <div class="menu-grid">
+      <a href="student-info.html" class="menu-card"><h2>Student Information</h2></a>
+      <a href="teacher-info.html" class="menu-card"><h2>Teacher Information</h2></a>
+      <a href="change-password.html" class="menu-card"><h2>Change Password</h2></a>
+    </div>
+  </main>
+</body>
+</html>

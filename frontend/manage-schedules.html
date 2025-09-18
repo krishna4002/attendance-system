@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Schedules</title>
+<style>
+  /* Reset & base */
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+  }
+
+  /* Center page content */
+  body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   /* vertical center */
+    align-items: center;       /* horizontal center */
+    padding: 2rem;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .header h1 {
+    margin: 0 0 1rem;
+  }
+  .back-btn {
+    text-decoration: none;
+    color: #0077cc;
+    font-weight: bold;
+  }
+
+  /* Menu grid layout */
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    max-width: 700px;
+    justify-items: center;
+  }
+
+  /* Menu cards */
+  .menu-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 220px;
+    height: 130px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .menu-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+  }
+  .menu-card h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<header class="header">
+  <h1>Manage Schedules</h1>
+  <a href="admin.html" class="back-btn">← Back</a>
+</header>
+
+<main class="menu-grid">
+  <a href="manual-schedule.html" class="menu-card"><h2>Manual Schedule</h2></a>
+  <a href="uploaded-schedule.html" class="menu-card"><h2>Uploaded Schedule</h2></a>
+</main>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Registration</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* --- Page Layout --- */
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f8ff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header.header {
+      text-align: center;
+      padding: 1rem;
+      background: #4a6cf7;
+      color: #fff;
+      position: relative;
+    }
+
+    .back-btn {
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+      text-decoration: none;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    /* Center form vertically & horizontally */
+    main.form-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    form {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    input {
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 0.5rem;
+    }
+
+    .camera-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 0.5rem;
+      background: #000;
+      margin-bottom: 0.5rem;
+    }
+
+    button#startCapture {
+      background: #4a6cf7;
+      color: #fff;
+      border: none;
+      padding: 0.8rem;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button#startCapture:hover {
+      background: #3654c6;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header with title and back navigation -->
+  <header class="header">
+    <h1>Teacher Registration</h1>
+    <a href="registration.html" class="back-btn">← Back</a>
+  </header>
+
+  <main class="form-container">
+    <form id="teacherForm">
+      <!-- Teacher ID -->
+      <label for="teacherId">Teacher ID (MTxx)</label>
+      <input type="text" id="teacherId" placeholder="e.g. MT01" required />
+
+      <!-- Teacher Name -->
+      <label for="teacherName">Full Name</label>
+      <input type="text" id="teacherName" placeholder="Enter full name" required />
+
+      <!-- Camera preview & progress -->
+      <div class="camera-section">
+        <video id="cameraPreview" autoplay playsinline></video>
+        <progress id="captureProgress" value="0" max="30"></progress>
+      </div>
+
+      <!-- Capture button -->
+      <button type="button" id="startCapture">Start Capture</button>
+    </form>
+  </main>
+
+  <!-- JavaScript for camera handling (placeholder for now) -->
+  <script>
+    const video = document.getElementById('cameraPreview');
+    const startBtn = document.getElementById('startCapture');
+    const progress = document.getElementById('captureProgress');
+
+    // Request camera access
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => { video.srcObject = stream; })
+      .catch(err => alert('Camera access denied: ' + err));
+
+    // Dummy capture simulation (progress bar fills up)
+    startBtn.addEventListener('click', () => {
+      progress.value = 0;
+      const interval = setInterval(() => {
+        progress.value += 1;
+        if (progress.value >= 30) clearInterval(interval);
+      }, 500);
+    });
+  </script>
+</body>
+</html>

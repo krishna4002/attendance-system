@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Manual Schedule</title>
+<style>
+  /* Reset & base */
+  html, body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;  /* header stays at top */
+  }
+
+  /* Header always visible */
+  .header {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .header h1 {
+    margin: 0 0 0.5rem;
+  }
+  .back-btn {
+    text-decoration: none;
+    color: #0077cc;
+    font-weight: bold;
+  }
+
+  /* Main centered card */
+  main {
+    flex: 1; /* take remaining height */
+    display: flex;
+    justify-content: center; /* horizontal center */
+    align-items: center;     /* vertical center */
+    padding: 2rem;
+  }
+  .content-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 2rem;
+    max-width: 700px;
+    width: 100%;
+  }
+
+  /* Form styles */
+  form {
+    display: grid;
+    gap: 1rem;
+  }
+  label { font-weight: bold; }
+  input, select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  .primary-btn {
+    background: #0077cc;
+    color: #fff;
+    border: none;
+    padding: 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s ease;
+  }
+  .primary-btn:hover { background: #005fa3; }
+
+  /* Table styles */
+  h2 {
+    margin-top: 2rem;
+    text-align: center;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: center;
+  }
+  th { background: #f0f0f0; }
+
+  @media (max-width: 600px) {
+    .content-card { padding: 1.5rem; }
+    table, thead, tbody, th, td, tr { font-size: 0.9rem; }
+  }
+</style>
+</head>
+<body>
+  <header class="header">
+    <h1>Manual Schedule</h1>
+    <a href="manage-schedules.html" class="back-btn">← Back</a>
+  </header>
+
+  <main>
+    <section class="content-card">
+      <!-- Add Schedule Form -->
+      <form id="manualScheduleForm">
+        <label>Class ID</label>
+        <input type="text" id="classId" placeholder="e.g. 10A" required />
+
+        <label>Subject</label>
+        <input type="text" id="subject" placeholder="e.g. Mathematics" required />
+
+        <label>Teacher ID</label>
+        <input type="text" id="teacherId" placeholder="e.g. MT01" required />
+
+        <label>Day</label>
+        <select id="day" required>
+          <option value="">Select Day</option>
+          <option>Monday</option><option>Tuesday</option>
+          <option>Wednesday</option><option>Thursday</option>
+          <option>Friday</option><option>Saturday</option>
+        </select>
+
+        <label>Start Time</label>
+        <input type="time" id="startTime" required />
+
+        <label>End Time</label>
+        <input type="time" id="endTime" required />
+
+        <button class="primary-btn" type="submit">Add Schedule</button>
+      </form>
+
+      <!-- Schedule Table -->
+      <h2>Current Schedules</h2>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Class</th><th>Subject</th><th>Teacher</th>
+            <th>Day</th><th>Start</th><th>End</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    // Add row logic
+    const form = document.getElementById('manualScheduleForm');
+    const tbody = document.querySelector('.data-table tbody');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${classId.value}</td>
+        <td>${subject.value}</td>
+        <td>${teacherId.value}</td>
+        <td>${day.value}</td>
+        <td>${startTime.value}</td>
+        <td>${endTime.value}</td>
+        <td><button class="primary-btn" onclick="this.closest('tr').remove()">Delete</button></td>
+      `;
+      tbody.appendChild(row);
+      form.reset();
+    });
+  </script>
+</body>
+</html>
